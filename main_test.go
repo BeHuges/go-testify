@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"fmt" если нужно вернуть список кафе, можно раскоментить...
 	"net/http"
 	"net/http/httptest"
 
@@ -26,15 +25,15 @@ func TestMainHandlerWhenStatusOkAndNotEmpty(t *testing.T) {
 }
 
 func TestMainHandlerWhenCityNotMoscow(t *testing.T) {
-	totalCity := "moscow"
-	req := httptest.NewRequest("GET", "/cafe?count=5&city=moscow", nil) // здесь нужно создать запрос к сервису
+
+	req := httptest.NewRequest("GET", "/cafe?count=5&city=syktyvkar", nil) // здесь нужно создать запрос к сервису
 
 	responseRecorder := httptest.NewRecorder()
 	handler := http.HandlerFunc(mainHandle)
 	handler.ServeHTTP(responseRecorder, req)
 
-	city := req.URL.Query().Get("city")
-	assert.Equal(t, totalCity, city, "Status code:%d, wrong city value", responseRecorder.Code)
+	require.Equal(t, http.StatusBadRequest, responseRecorder.Code)
+	assert.Equal(t, "wrong city value", responseRecorder.Body.String())
 }
 
 func TestMainHandlerWhenCountMoreThanTotal(t *testing.T) {
@@ -48,6 +47,5 @@ func TestMainHandlerWhenCountMoreThanTotal(t *testing.T) {
 
 	body := responseRecorder.Body.String()
 	actualCount := len(strings.Split(body, ","))
-	//fmt.Println(strings.Split(body, ",")) не понятно в задании, то ли нужно возвращать список кафе, то ли нет, закоментил...
 	assert.Equal(t, totalCount, actualCount, "Status code:%d, wrong count value", responseRecorder.Code)
 }
